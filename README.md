@@ -44,22 +44,52 @@ The code works as follows (the square brackets refer to variable names in the co
 
 
 + The value of `counter_max` is set after each pulse (See `flash` function) in the range `[counter_max_lower, counter_max_upper]`. This simulates the noise in the cycle interval of individual, isolated fireflies. 
++ While this cycle is running, the robot emits its clock state at a rate of 1000 /`counter_delay` Hz. Robots picking up this message calculate the difference `delay` between the received clock state and their clock. If their internal clock is ahead of the received clock, they reduce their clock by `correction_steps` steps.
 
-+ While this cycle is running, the robot emits its clock state at a rate of 1000 /`counter_delay` Hz. Robots picking up this message calculate the difference `delay` between the received clock state and their clock. If the received clock is ahead, they forward their clock by `correction_steps` steps. If the received clock state is behind, they reduce their clock state by `correction_steps` steps.
+## Exercises
 
-## Running the code
+### Injecting noise
 
-To run the code, you can use the online editor to compile it hex (https://www.kilobotics.com/editor). After this, you can upload and run the code as described here: https://www.kilobotics.com/documentation. Instead of using the online compiler, you can also use a local compiler. This is also described in the kilobots documentation: https://www.kilobotics.com/documentation.  
+For this experiment, you place a number of robots in close proximity. Measure the time it takes for robots to synchronize their flashing. You should try and alter the amount of noise on individual cycle lengths by editing the following lines of code 
+
+```c
+int counter_max_lower = 95;
+int counter_max_upper = 105;
+```
+
+Is there any level of noise beyond which synchronization does happen?
+
+### Subgroups
+
+For this experiment, you separate two groups of robots by at least five body diameters. This prevents communication between the groups. Each group will synchronize internally. Once this is established, you could bring the groups closer together. Does the complete group manage to sync? 
+
+### Message delay
+
+The signals fireflies use to synchronize (light flashes) travel almost instantaneously between individuals. However, other animals, such as some crickets, synchronize their behavior using acoustic signals. Over short distances, the delay between the emission and the reception of the signal will be short. However, as distance increases, the receiver will receive a time-delayed version of the emitted signal. This might interfere with the ability to synchronize clocks. 
+
+Although the robots use light to communicate and can only communicate over short distances, we can simulate the effects of delayed reception of signals. To this end, you can comment and alter the line
+
+```c
+int simulated_delay = 0;
+```
+
+This line of code simulates a delayed reception of the clock information of a neighbor. Observe whether robots achieve synchronization. What does failure or success tell you about the sensitivity of this system to delays?
 
 
-# Compiling locally 
+
+
+## Compiling locally 
 
 https://diode.group.shef.ac.uk/kilobots/index.php/Getting_Started:_How_to_work_with_kilobots
 
-Compiling code:
+Compiling code is done as follows.
 
 ```
 ./compileCode.sh synced_flashing
 ```
 
-** Notice: There is no extension `.c`!**
+## Compiling online
+
+To run the code, you can use the online editor to compile it hex (https://www.kilobotics.com/editor). After this, you can upload and run the code as described here: https://www.kilobotics.com/documentation.  
+
+Note: Jan 2021. I don't get this to work any longer.

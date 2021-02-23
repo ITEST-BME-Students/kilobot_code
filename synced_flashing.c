@@ -4,10 +4,11 @@
 int counter = 0;
 
 int counter_max = 100;
-int counter_max_lower = 95;
-int counter_max_upper = 105;
+int counter_max_lower = 99;
+int counter_max_upper = 101;
 int counter_delay = 10;
 int correction_steps = 2;
+int simulated_delay = 0;
 
 // Flags that signal the reception and sending of messages.
 int sent_message = 0;
@@ -22,9 +23,10 @@ int delta = 0;
 // This is is the message transmission callback function. 
 // Copy-pasted from example. Not sure what it does but
 // this seems a place holder to make sending the msg more eficient
-message_t *tx_message() {
-    return &msg;
-}
+// DO NOT TOUCH - not sure why but these bits seems essential.
+message_t message;
+// this seems a place holder to make sending the msg more eficient
+message_t *tx_message(){return &message;}
 
 void rx_message(message_t *message, distance_measurement_t *distance)
 {
@@ -32,6 +34,9 @@ void rx_message(message_t *message, distance_measurement_t *distance)
     new_message = 1;
     received_distance = estimate_distance(distance);
     received_counter = message->data[0];
+    //set_color(RGB(0,0,1));
+    //delay(50);
+    //set_color(RGB(0,0,0));
 }
 
 
@@ -49,6 +54,9 @@ int random_number(int output_start, int output_end){
 
 void tx_message_success() {
     sent_message = 1;
+    //set_color(RGB(1,0,0));
+    //delay(50);
+    //set_color(RGB(0,0,0));
 }
 
 void flash(){
@@ -62,9 +70,10 @@ void flash(){
 
 
 void update_clock(){
-    delta = received_counter - counter;
-    if (delta < -2){delta=-correction_steps;} 
-    if (delta > 2){delta= correction_steps;} 
+    received_counter = received_counter + simulated_delay;
+    signed char delta = counter - received_counter;
+    if (delta > 2){deltas=-correction_steps;} 
+    if (delta < 2){delta= 0;} 
     counter = counter + delta;
 }
 
@@ -76,22 +85,11 @@ void error_flash(){
 }
 
 
-void message_sent(){
-        if (sent_message){
-        sent_message = 0;
-        //set_color(RGB(1,0,0));
-        //delay(50);
-        //set_color(RGB(0,0,0));
-    
-    }
-}
+void message_sent(){if (sent_message){sent_message = 0;}}
 
 void message_received(){
         if (new_message){
         new_message = 0;
-        //set_color(RGB(0,1,0));
-        //delay(50);
-        //set_color(RGB(0,0,0));
         update_clock();
     
     }

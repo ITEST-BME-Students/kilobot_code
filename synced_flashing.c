@@ -1,25 +1,30 @@
-#include <kilolib.h>
-
+#include "kilolib.h"
 
 // These are the parameters of the internal clock of each robot.
 int counter = 0;
+
 int counter_max = 100;
-int counter_delay = 20;
+int counter_max_lower = 95;
+int counter_max_upper = 105;
+int counter_delay = 10;
+int correction_steps = 2;
 
 // Flags that signal the reception and sending of messages.
 int sent_message = 0;
 int new_message = 0;
 
 // Storage of communication.
-
+message_t message;
 int received_distance = 0;
 int received_counter = 0;
 int delta = 0;
 
-message_t message;
-
+// This is is the message transmission callback function. 
+// Copy-pasted from example. Not sure what it does but
 // this seems a place holder to make sending the msg more eficient
-message_t *tx_message(){return &message;}
+message_t *tx_message() {
+    return &msg;
+}
 
 void rx_message(message_t *message, distance_measurement_t *distance)
 {
@@ -30,22 +35,36 @@ void rx_message(message_t *message, distance_measurement_t *distance)
 }
 
 
+// a random number generation function, I wrote based on this
+// https://stackoverflow.com/questions/24216021/mapping-one-range-of-integers-to-another
+int random_number(int output_start, int output_end){
+    int output;    
+    int input = rand_soft();
+    int output_range = output_end - output_start;
+    output = input % (output_range + 1);
+    output = output + output_start;
+    return output;
+}
+
+
 void tx_message_success() {
     sent_message = 1;
 }
 
 void flash(){
     set_color(RGB(1,1,0));
-    delay(200);
+    delay(250);
     set_color(RGB(0,0,0));
+    //set noisy counter_max for next loop.
+    counter_max = random_number(counter_max_lower, counter_max_upper); 
     
 }
 
 
 void update_clock(){
     delta = received_counter - counter;
-    if (delta < -2){delta=-2;} 
-    if (delta > 2){delta= 2;} 
+    if (delta < -2){delta=-correction_steps;} 
+    if (delta > 2){delta= correction_steps;} 
     counter = counter + delta;
 }
 
@@ -80,14 +99,27 @@ void message_received(){
 
 
 void setup() {
+    // signal start of program
+    set_color(RGB(1,0,0));
+    delay(1000);
+    set_color(RGB(0,0,0));
+
     // some dummy message
     message.type = NORMAL;
     message.data[0] = 0;
     message.crc = message_crc(&message);
     
     // put your setup code here, to be run only once
+    
+    //Seed the software random number generator. 
+    //As per the api, the hardware number generator is slow and should be avoided
+    rand_seed(rand_hard());
+    // set first value of counter_max
+    counter_max = random_number(counter_max_lower, counter_max_upper); 
+
     // add some random delay here to ensure initiall desync
-    delay(rand_hard()*10);
+    // the random number generator returns an 8 bit number, ie range 0-255
+    delay(rand_soft()*10);
 }
 
 void loop() {
@@ -104,9 +136,9 @@ void loop() {
 int main() {
     // initialize hardware
     kilo_init();
-    kilo_message_tx_success = tx_message_success;
-    kilo_message_tx = tx_message;
-    kilo_message_rx = rx_message;
+    kilo_message_tx_success = tx_message_success; // register tranmsission success callback
+    kilo_message_tx = tx_message; // register message transmission calback
+    kilo_message_rx = rx_message; // register message reception callback
     // start program
     kilo_start(setup, loop);
 

@@ -72,7 +72,7 @@ void flash(){
 void update_clock(){
     received_counter = received_counter + simulated_delay;
     signed char delta = counter - received_counter;
-    if (delta > 2){deltas=-correction_steps;} 
+    if (delta > 2){delta=-correction_steps;} 
     if (delta < 2){delta= 0;} 
     counter = counter + delta;
 }

@@ -1,4 +1,4 @@
-# kilobots_code
+# kilobots
 
 ## Hardware
 
@@ -74,8 +74,6 @@ int simulated_delay = 0;
 ```
 
 This line of code simulates a delayed reception of the clock information of a neighbor. Observe whether robots achieve synchronization. What does failure or success tell you about the sensitivity of this system to delays?
-
-
 
 
 ## Compiling locally 

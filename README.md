@@ -36,7 +36,7 @@ The code works as follows (the square brackets refer to variable names in the co
 
 ## Prepared experiments
 
-The directory `KilobotRecordings` contains short videos documenting several experiments. These videos can be used to answer the questions below.
+The directory [KilobotRecordings]() contains short videos documenting several experiments. These videos can be used to answer the questions below.
 
 ### Descriptions of videos
 

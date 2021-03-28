@@ -3,42 +3,38 @@
 ## Biological background
 
 Fireflies are beetles that use flashes of light to attract females. In some species, males aggregate in large groups. These groups tend to synchronize their flashing. Here is some video of a North American species. When synchronized, the males produce a series of flashes. After this, they are simultaneously dark for a certain period before the flashing reoccurs:
-[https://www.youtube.com/watch?v=EnwVVE-EGVw]()
-
-Other species flash on and off in rapid succession, in synchrony:
+[https://www.youtube.com/watch?v=EnwVVE-EGVw](). Other species flash on and off in rapid succession, in synchrony:
 [https://www.youtube.com/watch?v=xp3XKw5UwmY]()
 
-Explaining these phenomena took scientists a long time, and initially, many people denied their existence altogether. Early on, people assumed some leader-follower relationship between beetles, thinking that beetles pay attention to a leader's flashing and that this triggered their own emission. However, now researchers hypothesize that each individual is a follower AND a leader. While there are probably differences between species in how they get synchronized, the general explanation is as follows.
+Explaining these phenomena took scientists a long time, and initially, many people denied their existence altogether. Early on, people assumed some leader-follower relationship between beetles, thinking that beetles pay attention to a leader's flashing and that this triggered their own emission. However, now researchers hypothesize that each individual is a follower and a leader. While there are probably differences between species in how they get synchronized, the general explanation is as follows.
 
 Each beetle has an internal clock or cycle. Each time the clock reaches a particular phase, a flash is produced. Perceiving the flash of neighboring beetles advances or resets the clock cycle. In that way, each beetle uses the input from its local neighbors to adjust its own clock. Likewise, it also provides input to its neighbors.
 
-Fireflies are now considered a classic example of self-organization in biology. The overall idea of self-organization is that order and organization can come about without central leadership or oversight but rather due to local interactions between many individuals. Other examples of self-organization include nest building in ants and flocking in birds. The phenomenon of firefly synchronization is also an example of a wider class of systems: coupled oscillators. This is discussed at the end of this lab session.
+Fireflies are now considered a classic example of self-organization in biology. The overall idea of self-organization is that order and organization can come about without central leadership or oversight. Instead, organization arises through local interactions between many individuals. Other examples of self-organization include nest building in ants and flocking in birds. The phenomenon of firefly synchronization is also an example of a wider class of systems: coupled oscillators. 
 
 ## Kilobot implementation
 
-The kilobots have an onboard LED, which allows producing firefly-like flashes of light. However, robots cannot reliably perceive the flashes of others. The robots do have a light sensor that, in principle, could be used for this purpose. But the output of these sensors is too unreliable for this demonstration. Its value would depend mainly on the background lighting. Moreover, whether a flash is detected would depend on the relative orientation of the robots. Therefore, we will not use the light sensor in this demo. Instead, we will use the capacity of the robots to send IR messages to close neighbors.
+The kilobots have an onboard LED, which allows producing firefly-like flashes of light. However, the robots cannot reliably perceive the flashes of others. The robots do have a light sensor that, in principle, could be used for this purpose. But the output of these sensors is too unreliable for this demonstration. Its value would depend mainly on the background lighting. Moreover, whether a flash is detected would depend on the relative orientation of the robots. Therefore, we will not use the light sensor in this demo. Instead, we will use the capacity of the robots to send IR messages to close neighbors.
 
-The unreliability of the LED to light sensor communication forces us to use a different mechanism. The robots can be programmed to broadcast messages. When set, the robot will emit IR signals that close neighbors can pick up (up to about three body diameters). The rate at which the message is sent cannot be controlled directly and is scheduled independently by the controller.  Messages are sent at a rate of approximately 2 Hz. Conversely, robots can be programmed to listen to messages arriving. Again, looking for messages is scheduled by the controller. The manual states that the robot checks for receipt of messages about three times a second.
+We can program the robots to broadcast messages. When set, the robot will emit IR signals that close neighbors can pick up (up to about three body diameters). The rate at which the message is sent cannot be controlled directly and is scheduled independently by the controller.  Messages are sent at a rate of approximately 2 Hz. Conversely, robots can be programmed to listen to messages arriving. Again, looking for messages is scheduled by the controller. The manual states that the robot checks for receipt of messages about three times a second.
 
 ## Algorithm
 
-The code works as follows (the square brackets refer to variable names in the code). 
+The code running on each robot works as follows (the square brackets refer to variable names in the code in the file `synced_flashing.c`). 
 
 + Each robot's main loop is started after a random initial delay (see `setup` function). This maximizes the probability of the robots being initially desynchronized. 
 
 + After this, each robot starts its internal clock `counter`, counting up to `counter_max`, each step taking 20 ms `counter_delay`. This implies that each cycle, on average, takes `t` seconds, t  = (counter_max * counter_delay) / 100.
 
-
 + The value of `counter_max` is set after each pulse (See `flash` function) in the range `[counter_max_lower, counter_max_upper]`. This simulates the noise in the cycle interval of individual, isolated fireflies. 
-+ While this cycle is running, the robot emits its clock state at a rate of 1000 /`counter_delay` Hz. Robots picking up this message calculate the difference `delay` between the received clock state and their clock. If their internal clock is ahead of the received clock, they reduce their clock by `correction_steps` steps.
+
++ While this cycle is running, the robot updates the message sent out about its clock state at a rate of 1000 /`counter_delay` Hz. Robots picking up this message calculate the difference `delay` between the received clock state and their clock. If their internal clock is ahead of the received clock, they reduce their clock by `correction_steps` steps.
 
 # Working with the Kilobots
 
 ## Prepared experiments
 
-The directory `KilobotRecordings`contains short videos documenting several experiments.  Direct link: [https://github.com/ITEST-BME-Students/kilobot_code/tree/master/KilobotRecordings]().
-
-These videos can be used to answer the questions below.
+We have recorded the behavior of the robots programmed with the synchronization algorithm under different conditions. The directory `KilobotRecordings` contains short videos documenting several experiments.  Direct link: [https://github.com/ITEST-BME-Students/kilobot_code/tree/master/KilobotRecordings]().  The name of each video file starts with `experiment_xx`. The various experiments are explained below. For each experiment, there are multiple videos. **To view the videos, click on the file name and then click on `Raw`. This will allow you to open or download the video**. These videos can be used to answer the questions below. 
 
 ### Descriptions of videos
 
